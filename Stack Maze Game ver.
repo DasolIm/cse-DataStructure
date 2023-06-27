@@ -1,0 +1,204 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+#include <windows.h>
+
+#define MAX_STACK_SIZE 20
+#define MAZE_SIZE 6
+#define UP  0x48
+#define DOWN 0x50
+#define LEFT 0x4b
+#define RIGHT 0x4d
+
+void gotoxy(int x, int y)
+{
+    COORD pos = { x, y };
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+}
+
+int score = 0;
+
+typedef struct
+{
+    short r;
+    short c;
+} element;
+
+typedef struct
+{
+    element data[MAX_STACK_SIZE];
+    int top;
+} Stacktype;
+
+void init(Stacktype* s)
+{
+    s->top = -1;
+}
+
+int full(Stacktype* s)
+{
+    return (s->top == MAX_STACK_SIZE - 1);
+}
+
+int empty(Stacktype* s)
+{
+    return (s->top == -1);
+}
+
+void push(Stacktype* s, element item)
+{
+    if (full(s))
+    {
+        printf("overflow error\n");
+    }
+    else
+    {
+        s->data[++(s->top)] = item;
+    }
+}
+
+element pop(Stacktype* s)
+{
+    if (empty(s))
+    {
+        printf("underflow error\n");
+    }
+    else
+    {
+        return s->data[(s->top)--];
+    }
+}
+
+char maze[MAZE_SIZE][MAZE_SIZE] =
+{
+   {'1', '1', '1', '1', '1', '1'},
+   {'0', '0', 'B', '0', '0', '1'},
+   {'1', '0', '0', '@', '1', '1'},
+   {'1', '0', '1', '0', '1', '1'},
+   {'1', '0', '1', '0', '@', 'x'},
+   {'1', '1', '1', '1', '1', '1'},
+};
+
+element entry = { 1, 0 }, here = { 1, 0 };       //r, c
+
+void print_maze(char maze[MAZE_SIZE][MAZE_SIZE])
+{
+    printf("\n");
+    for (int r = 0; r < MAZE_SIZE; r++)
+    {
+        for (int c = 0; c < MAZE_SIZE; c++)
+        {
+            printf("%c", maze[r][c]);
+        }
+        printf("\n");
+    }
+}
+
+void push_loc(Stacktype* s, int r, int c)
+{
+    if (r < 0 || c < 0) return;
+
+    if (maze[r][c] != '1' && maze[r][c] != '.')
+    {
+        element tmp;
+        tmp.r = r;
+        tmp.c = c;
+        push(s, tmp);
+    }
+}
+
+int inside_maze(char maze[MAZE_SIZE][MAZE_SIZE], element e) 
+{
+    return (0 <= e.c) && (e.c <= (MAZE_SIZE - 1)) && (0 <= e.r) && (e.r <= (MAZE_SIZE - 1));
+}
+
+int main()
+{
+    here = entry;
+    element temp = here;
+    unsigned char ch = '\0';
+    maze[here.r][here.c] = 'e';
+    print_maze(maze);
+
+    while (1)
+    {
+        if (!_kbhit()) 
+        {
+            ch = _getch();
+            if (ch == 0x00 || ch == 0xE0) 
+            {
+                ch = _getch();
+                switch (ch) 
+                {
+                case UP:
+                    temp.r = here.r - 1;
+                    break;
+                case DOWN:
+                    temp.r = here.r + 1;
+                    break;
+                case LEFT:
+                    temp.c = here.c - 1;
+                    break;
+                case RIGHT:
+                    temp.c = here.c + 1;
+                    break;
+                default:
+                    break;
+                }
+                if (inside_maze(maze, temp)) 
+                {
+                    if (maze[temp.r][temp.c] == 'x') 
+                    {
+                        system("cls");
+                        print_maze(maze);
+                        break;
+                    }
+                    else if (maze[temp.r][temp.c] == '0' || maze[temp.r][temp.c] == '.')
+                    {
+                        maze[here.r][here.c] = '.';
+                        maze[temp.r][temp.c] = 'e';
+                        here = temp;
+                        system("cls");
+                        print_maze(maze);
+                    }
+                    else if (maze[temp.r][temp.c] == '@') //item
+                    {
+                        maze[here.r][here.c] = '.';
+                        maze[temp.r][temp.c] = 'e';
+                        here = temp;
+                        system("cls");
+                        print_maze(maze);
+                        gotoxy(20, 5);
+                        score += 100;
+                        printf("+%d", score);
+                    }
+                    else if (maze[temp.r][temp.c] == 'B') //bomb
+                    {
+                        maze[here.r][here.c] = '.';
+                        maze[temp.r][temp.c] = 'e';
+                        here = temp;
+                        system("cls");
+                        print_maze(maze);
+                        gotoxy(20, 5);
+                        printf("bomb!");
+                        return 0;
+                    }
+                    else 
+                    {
+                        gotoxy(20, 5);
+                        printf("벽 만남\n");
+                    }
+                }
+                else 
+                {
+                    temp = here;
+                    gotoxy(20, 5);
+                    printf("맵 이탈\n");
+                }
+            }
+        }
+    }
+
+    printf("\nescape success!\n");
+    return 0;
+}
