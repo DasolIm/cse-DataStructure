@@ -1,0 +1,124 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_STACK_SIZE 20
+#define MAZE_SIZE 6
+
+typedef struct
+{
+	short r;
+	short c;
+} element;
+
+typedef struct
+{
+	element data[MAX_STACK_SIZE];
+	int top;
+} Stacktype;
+
+void init(Stacktype* s)
+{
+	s->top = -1;
+}
+
+int full(Stacktype* s)
+{
+	return (s->top == MAX_STACK_SIZE - 1);
+}
+
+int empty(Stacktype* s)
+{
+	return (s->top == -1);
+}
+
+void push(Stacktype* s, element item)
+{
+	if (full(s))
+	{
+		printf("overflow error\n");
+	}
+	else
+	{
+		s->data[++(s->top)] = item;
+	}
+}
+
+element pop(Stacktype* s)
+{
+	if (empty(s))
+	{
+		printf("underflow error\n");
+	}
+	else
+	{
+		return s->data[(s->top)--];
+	}
+}
+
+char maze[MAZE_SIZE][MAZE_SIZE] =
+{
+	{'1', '1', '1', '1', '1', '1'},
+	{'e', '0', '1', '0', '0', '1'},
+	{'1', '0', '0', '0', '1', '1'},
+	{'1', '0', '1', '0', '1', '1'},
+	{'1', '0', '1', '0', '0', 'x'},
+	{'1', '1', '1', '1', '1', '1'},
+};
+
+element entry = { 1, 0 }, here = { 1, 0 };
+
+void print_maze(char maze[MAZE_SIZE][MAZE_SIZE])
+{
+	printf("\n");
+	for (int r = 0; r < MAZE_SIZE; r++)
+	{
+		for (int c = 0; c < MAZE_SIZE; c++)
+		{
+			printf("%c", maze[r][c]);
+		}
+		printf("\n");
+	}
+}
+
+void push_loc(Stacktype* s, int r, int c)
+{
+	if (r < 0 || c < 0) return;
+
+	if (maze[r][c] != '1' && maze[r][c] != '.')
+	{
+		element tmp;
+		tmp.r = r;
+		tmp.c = c;
+		push(s, tmp);
+	}
+}
+
+int main()
+{
+	Stacktype s;
+	init(&s);
+	int r, c;
+	here = entry;
+
+	while (maze[here.r][here.c] != 'x')
+	{
+		r = here.r;
+		c = here.c;
+		maze[r][c] = '.'; //방문했음
+		print_maze(maze);
+		push_loc(&s, r - 1, c);
+		push_loc(&s, r + 1, c);
+		push_loc(&s, r, c - 1);
+		push_loc(&s, r, c + 1);
+		if (empty(&s))
+		{
+			printf("you fail\n");
+			return 0;
+		}
+		else
+		{
+			here = pop(&s); //스택에서 하나 꺼내 현재위치로 만들기
+		}
+	}
+
+	printf("escape success!\n");
+}
