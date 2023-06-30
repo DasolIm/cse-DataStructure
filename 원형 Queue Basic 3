@@ -1,0 +1,84 @@
+#include <stdio.h>
+#define MAX_QUEUE_SIZE 5
+
+typedef int element;
+
+typedef struct
+{
+	element data[MAX_QUEUE_SIZE];
+	int front, rear;
+} Queuetype;
+
+void init(Queuetype* q)
+{
+	q->front = 0;
+	q->rear = 0;
+}
+
+int full(Queuetype* q)
+{
+	return ( (q->rear + 1) % MAX_QUEUE_SIZE == q->front );
+}
+
+void enqueue(Queuetype* q, element item)
+{
+	//overflow check
+	if (full(q))
+	{
+		printf("overflow error of queue\n");
+	}
+
+	q->rear = (q->rear + 1) % MAX_QUEUE_SIZE;
+	q->data[q->rear] = item;
+}
+
+int empty(Queuetype* q)
+{
+	return q->front == q->rear;
+}
+
+void print_queue(Queuetype* q)
+{
+	printf("QUEUE(front=%d, rear=%d) : ", q->front, q->rear);
+	if (!empty(q))
+	{
+		int i = q->front;
+		do
+		{
+			i = (i + 1) % MAX_QUEUE_SIZE;
+			printf("[%d]", q->data[i]);
+			if (i == q->rear) break;
+		} while (i != q->front);
+	}
+	printf("\n");
+}
+
+element dequeue(Queuetype* q)
+{
+	//underflow check
+	if (empty(q))
+	{
+		printf("underflow error of queue\n");
+	}
+
+	q->front = (q->front + 1) % MAX_QUEUE_SIZE;
+	return q->data[q->front];
+}
+
+int main()
+{
+	Queuetype queue;
+	init(&queue);
+
+	enqueue(&queue, 10); 
+	enqueue(&queue, 20); 
+	enqueue(&queue, 30);
+	
+	print_queue(&queue);
+
+	element temp = dequeue(&queue);
+	printf("꺼내진 정수 : %d\n", temp);
+	print_queue(&queue);
+
+	return 0;
+}
