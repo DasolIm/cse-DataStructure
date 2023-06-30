@@ -76,5 +76,7 @@ int main()
 		printf("Dequeued element: %d\n", user);
 	}
 
+	printf("Dequeue completed\n");
+
 	return 0;
 }
