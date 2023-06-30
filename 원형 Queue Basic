@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_QUEUE_SIZE 5
+
+typedef int element;
+typedef struct
+{
+	element data[MAX_QUEUE_SIZE];
+	int front, rear;
+} Queuetype;
+
+void init(Queuetype* q)
+{
+	q->front = 0;
+	q->rear = 0;
+}
+
+int full(Queuetype* q)
+{
+	return ((q->rear + 1) % MAX_QUEUE_SIZE == q->front);
+}
+
+int empty(Queuetype* q)
+{
+	return (q->rear == q->front);
+}
+
+void enqueue(Queuetype* q, element item)
+{
+	if (full(q))
+	{
+		printf("Queue overflow error\n");
+	}
+	else
+	{
+		q->rear = (q->rear + 1) % MAX_QUEUE_SIZE;
+		q->data[q->rear] = item;
+	}
+}
+
+element dequeue(Queuetype* q)
+{
+	if (empty(q))
+	{
+		printf("Queue empty\n");
+		exit(1);
+	}
+	else
+	{
+		q->front = (q->front + 1) % MAX_QUEUE_SIZE;
+		return q->data[q->front];
+	}
+}
+
+int main()
+{
+	Queuetype queue;
+	int element;
+	init(&queue);
+
+	enqueue(&queue, 10);
+	enqueue(&queue, 20);
+	enqueue(&queue, 30);
+
+	element = dequeue(&queue);
+	printf("%d\n", element);
+
+	element = dequeue(&queue);
+	printf("%d\n", element);
+	
+	return 0;
+}
