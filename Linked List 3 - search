@@ -1,0 +1,71 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef int element;
+
+typedef struct listnode
+{
+	element data;
+	struct listnode* link;
+} listnode;
+
+listnode* insert_first(listnode* head, element value)
+{
+	listnode* p = (listnode*)malloc(sizeof(listnode));
+	p->data = value;
+	p->link = head;
+	head = p;
+	return head;
+}
+
+void print(listnode* head)
+{
+	for (listnode* p = head; p != NULL; p = p->link)
+	{
+		printf("%d -> ", p->data);
+	}
+	printf("\n");
+}
+
+listnode* delete_first(listnode* head)
+{
+	listnode* removed;
+	if (head == NULL) return NULL;
+	removed = head;
+	head = removed->link;
+	free(removed);
+	return head;
+}
+
+listnode* search(listnode* head, element x)
+{
+	listnode* p = head;
+	while (p != NULL)
+	{
+		if (p->data == x) return p->link;
+		p = p->link;
+	}
+	return NULL;
+}
+
+int main()
+{
+	listnode* head = NULL;
+
+	head = insert_first(head, 10);
+	head = insert_first(head, 20);
+	head = insert_first(head, 30);
+	head = insert_first(head, 40);
+	head = insert_first(head, 50);
+	print(head);
+
+	head = delete_first(head); //40->30->20->10
+	print(head);
+
+	head = delete_first(head); //30->20->10
+	print(head);
+
+	listnode* s = search(head, 20);
+
+	return 0;
+}
