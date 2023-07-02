@@ -1,0 +1,27 @@
+#include <stdio.h>
+
+typedef int element;
+
+typedef struct listnode
+{
+	element data;
+	struct listnode* link; //자기참조구조체
+} listnode;
+
+int main()
+{
+	listnode a, b;
+	listnode* head = &a;
+
+	a.data = 10;
+	b.data = 20;
+	a.link = &b;
+	b.link = NULL;
+
+	printf("%d\n", a.data);
+	printf("%d\n", head->data);
+	printf("%d\n", b.data);
+	printf("%d\n", head->link->data);
+
+	return 0;
+}
