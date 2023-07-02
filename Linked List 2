@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef int element;
+
+typedef struct listnode
+{
+	element data;
+	struct listnode* link; //자기참조구조체
+} listnode;
+
+listnode* insert_first(listnode* head, element value)
+{
+	listnode* p = (listnode*)malloc(sizeof(listnode));
+	p->data = value;
+	p->link = head;
+	head = p;
+	return head;
+}
+
+listnode* delete_first(listnode* head)
+{
+	listnode* removed;
+	if (head == NULL) return NULL;
+	removed = head;
+	head = removed->link;
+	free(removed);
+	return head;
+}
+
+void print(listnode* head)
+{
+	for (listnode* p = head; p != NULL; p = p->link)
+	{
+		printf("%d->", p->data);
+	}
+	printf("NULL \n");
+}
+
+int main()
+{
+	listnode* head = NULL;
+
+	head = insert_first(head, 10);
+	head = insert_first(head, 20);
+	head = insert_first(head, 30);
+	print(head);
+
+	head = delete_first(head);
+	print(head);
+
+	return 0;
+}
