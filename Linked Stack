@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef int element;
+typedef struct stacknode
+{
+	element data;
+	struct stacknode* link;
+} stacknode;
+
+typedef struct
+{
+	stacknode* top;
+} linkedstacktype;
+
+void init(linkedstacktype* s)
+{
+	s->top = NULL;
+}
+
+void push(linkedstacktype* s, element item)
+{
+	stacknode* tmp = (stacknode*)malloc(sizeof(stacknode));
+	tmp->data = item;
+	tmp->link = NULL;
+	s->top = tmp;
+}
+
+void print_stack(linkedstacktype* s)
+{
+	for (stacknode* p = s->top; p; p = p->link)
+	{
+		printf("%d->", p->data);
+	}
+	printf("\n");
+}
+
+int empty(linkedstacktype* s)
+{
+	return s->top == NULL;
+}
+
+element pop(linkedstacktype* s)
+{
+	//underflow check
+	if (empty(s))
+	{
+		printf("empty stack\n");
+		exit(1);
+	}
+	stacknode* tmp = s->top;
+	element data = s->top->data;
+	s->top = s->top->link;
+	return data;
+	free(tmp);
+}
+
+int main()
+{
+	linkedstacktype s;
+	init(&s);
+	push(&s, 10);
+	print_stack(&s);
+	push(&s, 20);
+	print_stack(&s);
+	push(&s, 30);
+	print_stack(&s);
+	element item = pop(&s);
+	printf("pop value = %d\n", item);
+	print_stack(&s);
+
+	return 0;
+}
