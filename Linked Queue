@@ -1,0 +1,88 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef int element;
+
+typedef struct QueueNode
+{
+	element data;
+	struct QueueNode* link;
+} QueueNode;
+
+typedef struct
+{
+	QueueNode* front, * rear;
+} LinkedQueueType;
+
+void init(LinkedQueueType* q)
+{
+	q->front = q->rear = NULL;
+}
+
+int empty(LinkedQueueType* q)
+{
+	return q->front == NULL;
+}
+
+void enqueue(LinkedQueueType* q, element item)
+{
+	QueueNode* tmp = (QueueNode*)malloc(sizeof(QueueNode));
+	tmp->data = item;
+	tmp->link = NULL;
+	if (empty(q))
+	{
+		q->front = tmp;
+		q->rear = tmp;
+	}
+	else
+	{
+		q->rear->link = tmp;
+		q->rear = tmp;
+	}
+}
+
+void print_queue(LinkedQueueType* q)
+{
+	for (QueueNode* p = q->front; p; p = p->link)
+	{
+		printf("%d->", p->data);
+	}
+	printf("\n");
+}
+
+void dequeue(LinkedQueueType* q)
+{
+	QueueNode* tmp = q->front;
+	element data;
+	//underflow check
+	if (empty(q))
+	{
+		printf("underflow error\n");
+		exit(1);
+	}
+	else
+	{
+		data = tmp->data;
+		q->front = q->front->link;
+		if (q->front == NULL) //하나 있는 노드를 방금 front가 삭제
+		{
+			q->rear = NULL;
+		}
+		free(tmp);
+		return data;
+	}
+}
+
+int main()
+{
+	LinkedQueueType queue;
+	init(&queue);
+	enqueue(&queue, 10);
+	print_queue(&queue);
+	enqueue(&queue, 20);
+	print_queue(&queue);
+	enqueue(&queue, 30);
+	print_queue(&queue);
+	dequeue(&queue);
+	return 0;
+}
