@@ -1,0 +1,148 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+typedef struct listnode
+{
+	int coef;
+	int expon;
+	struct listnode* link;
+} listnode;
+
+typedef struct listtype
+{
+	int size;
+	listnode* head;
+	listnode* tail;
+} listtype;
+
+listnode* create()
+{
+	listtype* plist = (listtype*)malloc(sizeof(listtype));
+	plist->size = 0;
+	plist->head = NULL;
+	plist->tail = NULL;
+	return plist;
+}
+
+void insert_last(listtype* plist, int coef, int expon)
+{
+	listnode* temp = (listnode*)malloc(sizeof(listnode));
+	temp->coef = coef;
+	temp->expon = expon;
+	temp->link = NULL;
+
+	if (plist->tail == NULL)
+	{
+		plist->head = temp;
+		plist->tail = temp;
+	}
+	else
+	{
+		plist->tail->link = temp;
+		plist->tail = temp;
+	}
+	plist->size++;
+}
+
+void poly_add(listtype* plist1, listtype* plist2, listtype* plist3)
+{
+	int sum;
+	listnode* a = plist1->head;
+	listnode* b = plist2->head;
+
+	while (a && b)
+	{
+		if (a->expon == b->expon)
+		{
+			sum = a->coef + b->coef;
+			if (sum != 0) insert_last(plist3, sum, a->expon);
+			a = a->link;
+			b = b->link;
+		}
+		else if (a->expon < b->expon)
+		{
+			insert_last(plist3, b->coef, b->expon);
+			b = b->link;
+		}
+		else
+		{
+			insert_last(plist3, a->coef, a->expon);
+			a = a->link;
+		}
+	}
+
+	for (; a != NULL; a = a->link)
+	{
+		insert_last(plist3, a->coef, a->expon);
+	}
+	for (; b != NULL; b = b->link)
+	{
+		insert_last(plist3, b->coef, b->expon);
+	}
+}
+
+double poly_calc(listtype* plist, double user)
+{
+	listnode* b = plist->head;
+	double res = 0;
+	for (; b; b = b->link)
+	{
+		double tmp = b->coef * pow(user, b->expon);
+		res += tmp;
+	}
+	return res;
+}
+
+void poly_print(listtype* plist)
+{
+	listnode* p = plist->head;
+	for (; p; p = p->link)
+	{
+		if (p->link == NULL)
+			printf("%dx^%d", p->coef, p->expon);
+		else
+			printf("%dx^%d + ", p->coef, p->expon);
+	}
+	printf("\n");
+}
+
+int main()
+{
+	listtype* list1, * list2, * list3;
+
+	list1 = create();
+	list2 = create();
+	list3 = create();
+
+	insert_last(list1, 4, 1);
+	insert_last(list1, 4, 2);
+	insert_last(list1, 4, 3);
+	insert_last(list1, 4, 4);
+
+	insert_last(list2, 7, 1);
+	insert_last(list2, 7, 2);
+	insert_last(list2, 7, 3);
+	insert_last(list2, 7, 4);
+
+	poly_add(list1, list2, list3);
+
+	printf("첫번째 수식 = ");
+	poly_print(list1);
+	printf("두번째 수식 = ");
+	poly_print(list2);
+	printf("결과 수식 = ");
+	poly_print(list3);
+
+	double user[10] = { 0.0 };
+	for (int i = 0; i < 10; i++)
+	{
+		printf("%d번째 x 입력 : ", i + 1);
+		scanf("%lf", &user[i]);
+		double res = poly_calc(list3, user[i]);
+		printf("정답 : %.2lf\n", res);
+	}
+
+	return 0;
+}
