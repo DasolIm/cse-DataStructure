@@ -1,0 +1,190 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <time.h>
+
+typedef struct listnode
+{
+	int coef;
+	int expon;
+	struct listnode* link;
+} listnode;
+
+typedef struct listtype
+{
+	int size;
+	listnode* head;
+	listnode* tail;
+} listtype;
+
+listnode* create()
+{
+	listtype* plist = (listtype*)malloc(sizeof(listtype));
+	plist->size = 0;
+	plist->head = NULL;
+	plist->tail = NULL;
+	return plist;
+}
+
+void insert_last(listtype* plist, int coef, int expon)
+{
+	listnode* temp = (listnode*)malloc(sizeof(listnode));
+	temp->coef = coef;
+	temp->expon = expon;
+	temp->link = NULL;
+
+	if (plist->tail == NULL)
+	{
+		plist->head = temp;
+		plist->tail = temp;
+	}
+	else
+	{
+		plist->tail->link = temp;
+		plist->tail = temp;
+	}
+	plist->size++;
+}
+
+void poly_add(listtype* plist1, listtype* plist2, listtype* plist3)
+{
+	int sum;
+	listnode* a = plist1->head;
+	listnode* b = plist2->head;
+
+	while (a && b)
+	{
+		if (a->expon == b->expon)
+		{
+			sum = a->coef + b->coef;
+			if (sum != 0) insert_last(plist3, sum, a->expon);
+			a = a->link;
+			b = b->link;
+		}
+		else if (a->expon < b->expon)
+		{
+			insert_last(plist3, b->coef, b->expon);
+			b = b->link;
+		}
+		else
+		{
+			insert_last(plist3, a->coef, a->expon);
+			a = a->link;
+		}
+	}
+
+	for (; a != NULL; a = a->link)
+	{
+		insert_last(plist3, a->coef, a->expon);
+	}
+	for (; b != NULL; b = b->link)
+	{
+		insert_last(plist3, b->coef, b->expon);
+	}
+}
+
+double poly_calc_user(listtype* plist, double user)
+{
+	listnode* x = plist->head;
+	double res = 0;
+	for (; x; x = x->link)
+	{
+		double tmp = x->coef * pow(user, x->expon);
+		res += tmp;
+	}
+	return res;
+}
+
+double poly_calc_random(listtype* plist)
+{
+	listnode* b = plist->head;
+	double res = 0;
+	for (; b; b = b->link)
+	{
+		double tmp = b->coef * pow(rand(), b->expon);
+		res += tmp;
+	}
+	return res;
+}
+
+void poly_print(listtype* plist)
+{
+	listnode* p = plist->head;
+	for (; p; p = p->link)
+	{
+		if (p->link == NULL)
+			printf("%dx^%d", p->coef, p->expon);
+		else
+			printf("%dx^%d + ", p->coef, p->expon);
+	}
+	printf("\n");
+}
+
+int main()
+{
+	listtype* list1, * list2, * list3;
+
+	list1 = create();
+	list2 = create();
+	list3 = create();
+
+	insert_last(list1, 4, 1);
+	insert_last(list1, 4, 2);
+	insert_last(list1, 4, 3);
+	insert_last(list1, 4, 4);
+
+	insert_last(list2, 7, 1);
+	insert_last(list2, 7, 2);
+	insert_last(list2, 7, 3);
+	insert_last(list2, 7, 4);
+
+	poly_add(list1, list2, list3);
+
+	printf("첫번째 수식 = ");
+	poly_print(list1);
+	printf("두번째 수식 = ");
+	poly_print(list2);
+	printf("결과 수식 = ");
+	poly_print(list3);
+
+	int choice = 0;
+	srand(time(NULL));
+
+	do {
+		printf("\n1번과 2번 메뉴 중 하나를 골라주세요.\n");
+		printf("1. 10개의 x를 입력받아 결과값 출력하기\n");
+		printf("2. 10개의 x를 랜덤으로 뽑아 결과값 출력하기\n");
+		printf("원하는 작업을 선택하세요: ");
+		scanf("%d", &choice);
+
+		switch (choice) 
+		{
+		case 1:
+			printf("항목 1을 선택했습니다.\n");
+			double user[10] = { 0.0 };
+			for (int i = 0; i < 10; i++)
+			{
+				printf("%d번째 x 입력 : ", i + 1);
+				scanf("%lf", &user[i]);
+				double res = poly_calc_user(list3, user[i]);
+				printf("정답 : %.2lf\n", res);
+			}
+			break;
+		case 2:
+			printf("항목 2를 선택했습니다.\n");
+			double random[10] = { 0.0 };
+			for (int i = 0; i < 10; i++)
+			{
+				double res = poly_calc_random(list3, random[i]);
+				printf("정답 : %.2lf\n", res);
+			}
+			break;
+		default:
+			printf("프로그램을 종료합니다.\n");
+			break;
+		}
+	} while (choice == 1 && choice == 2);
+
+	return 0;
+}
