@@ -1,0 +1,63 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct
+{
+	char name[20];
+} element;
+
+typedef struct listnode
+{
+	element data;
+	struct listnode* link;
+} listnode;
+
+listnode* insert_first(listnode* head, element value)
+{
+	listnode* p = (listnode*)malloc(sizeof(listnode));
+	p->data = value;
+	p->link = head;
+	head = p;
+	return head;
+}
+
+void print_list(listnode* head)
+{
+	for (listnode* p = head; p != NULL; p = p->link)
+		printf("%s->", p->data.name); //구조체 안의 구조체
+	printf("\n");
+}
+
+listnode* delete_first(listnode* head)
+{
+	listnode* removed = head; 
+	if (head == NULL) return NULL;
+	head = removed->link;
+	free(removed);
+	return head;
+}
+
+int main()
+{
+	listnode* head = NULL;
+	element data;
+	
+	strcpy(data.name, "dawn");
+	head = insert_first(head, data);
+	print_list(head);
+
+	strcpy(data.name, "river");
+	head = insert_first(head, data);
+	print_list(head);
+
+	strcpy(data.name, "stroll");
+	head = insert_first(head, data);
+	print_list(head);
+
+	//head = delete_first(head);
+	//print_list(head);
+
+	return 0;
+}
