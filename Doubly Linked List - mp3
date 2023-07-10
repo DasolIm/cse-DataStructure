@@ -1,0 +1,92 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef char element[100];
+
+typedef struct Dlistnode
+{
+    element data;
+    struct Dlistnode* llink;
+    struct Dlistnode* rlink;
+} Dlistnode;
+
+Dlistnode* current;
+
+void dinsert(Dlistnode* before, const element data)
+{
+    Dlistnode* newnode = (Dlistnode*)malloc(sizeof(Dlistnode));
+    strcpy(newnode->data, data);
+    newnode->llink = before;
+    newnode->rlink = before->rlink;
+    before->rlink->llink = newnode;
+    before->rlink = newnode;
+}
+
+void ddelete(Dlistnode* head, Dlistnode* removed)
+{
+    if (removed == head) return;
+    removed->llink->rlink = removed->rlink;
+    removed->rlink->llink = removed->llink;
+    free(removed->data);
+    free(removed);
+}
+
+void init(Dlistnode* phead)
+{
+    phead->llink = phead;
+    phead->rlink = phead;
+}
+
+void print_dlist(Dlistnode* phead)
+{
+    Dlistnode* p;
+    for (p = phead->rlink; p != phead; p = p->rlink)
+    {
+        if (p == current)
+            printf("<- | #%s# | -> ", p->data);
+        else
+            printf("<- | %s | -> ", p->data);
+    }
+    printf("\n");
+}
+
+int main()
+{
+    Dlistnode* head = (Dlistnode*)malloc(sizeof(Dlistnode));
+    init(head);
+
+    dinsert(head, "The Weekend");
+    dinsert(head, "Who Do You Love");
+    dinsert(head, "@elio.irl");
+
+    current = head->rlink;
+    printf("Now playing,,, <%s>\n", current->data);
+    print_dlist(head);
+
+    char ch;
+    do
+    {
+        printf("\nChoose a key (<, >, q): ");
+        ch = getchar();
+        if (ch == '<') 
+        {
+            current = current->llink;
+            if (current == head)
+                current = current->llink;
+        }
+        else if (ch == '>')
+        {
+            current = current->rlink;
+            if (current == head)
+                current = current->rlink;
+        }
+
+        printf("Now playing,,, <%s>\n", current->data);
+        print_dlist(head);
+        getchar();
+    } while (ch != 'q');
+
+    return 0;
+}
