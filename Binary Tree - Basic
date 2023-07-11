@@ -1,0 +1,42 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef int element;
+typedef struct treenode
+{
+    element key;
+    struct treenode* left, * right;
+} treenode;
+
+//노드의 개수
+int get_node_count(treenode* node)
+{
+    int count = 0;
+    if (node != NULL)
+        count = 1 + get_node_count(node->left) + get_node_count(node->right);
+    return count;
+}
+
+//단말노드의 개수
+int get_leaf_count(treenode* node)
+{
+    int count = 0;
+    if (node != NULL)
+    {
+        if (node->left == NULL && node->right == NULL)
+            return 1;
+        else
+            count = 1 + get_leaf_count(node->left) + get_leaf_count(node->right);
+    }
+    return count;
+}
+
+//트리의 높이
+int get_height(treenode* node)
+{
+    int height = 0;
+    if (node != NULL)
+        height = 1 + MAX(get_height(node->left) + get_height(node->right));
+    return height;
+}
