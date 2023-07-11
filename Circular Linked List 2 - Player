@@ -1,0 +1,74 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef char element[10];
+typedef struct listnode
+{
+	element data;
+	struct listnode* link;
+} listnode;
+
+listnode* insert_first(listnode* head, element data)
+{
+	listnode* node = (listnode*)malloc(sizeof(listnode));
+	strcpy(node->data, data);
+	if (head == NULL)
+	{
+		head = node;
+		node->link = head;
+	}
+	else
+	{
+		node->link = head->link;
+		head->link = node;
+	}
+	return head;
+}
+
+listnode* insert_last(listnode* head)
+{
+	listnode* node = (listnode*)malloc(sizeof(listnode));
+	if (head == NULL)
+	{
+		head = node;
+		node->link = head;
+	}
+	else
+	{
+		node->link = head->link;
+		head->link = node;
+		head = node;
+	}
+}
+
+void print_list(listnode* head)
+{
+	listnode* p = head->link;
+	if (head == NULL) return;
+	do
+	{
+		printf("%d->", p->data);
+		p = p->link;
+	} while (p != head);
+	printf("%d->", p->data);
+}
+
+int main()
+{
+	listnode* head = NULL;
+	head = insert_first(head, "Calum");
+	head = insert_first(head, "Ashton");
+	head = insert_first(head, "Luke");
+	head = insert_first(head, "Michael");
+
+	listnode* p = head;
+	for (int i = 0; i < 10; i++)
+	{
+		printf("current player : %s\n", p->data);
+		p = p->link;
+	}
+
+	return 0;
+}
